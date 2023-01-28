@@ -1905,9 +1905,39 @@ CLLocationCoordinate2D randomWorldCoordinate(void) {
     self.styleNames = [NSMutableArray array];
     self.styleURLs = [NSMutableArray array];
     
+    NSString* stylePath = [[NSBundle mainBundle] pathForResource:@"zurich" ofType:@"json"];
+    NSString* style = [NSString stringWithContentsOfFile:stylePath
+                                                  encoding:NSUTF8StringEncoding
+                                                      error:NULL];
+    
+    NSString *mbtilesPath = [[NSBundle mainBundle] pathForResource:@"zurich_switzerland" ofType:@"mbtiles"];
+    NSURL *url = [NSURL fileURLWithPath:mbtilesPath];
+    NSLog(@"mbtiles %@", url);
+    // file:///private/var/containers/Bundle/Application/C0622E9E-38E7-4390-A013-C46F0EB97BEB/MapLibre%20GL.app/zurich_switzerland.mbtiles
+    NSString *mbtilesUrl = [url.absoluteString stringByReplacingOccurrencesOfString:@"file" withString:@"mbtiles"];
+    
+    NSString *mbtilesStyle = [style stringByReplacingOccurrencesOfString:@"{path}" withString:mbtilesUrl];
+    
+    //get the documents directory:
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+        (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+
+    //make a file name to write the data to using the documents directory:
+    NSString *mbtilesStylePath = [NSString stringWithFormat:@"%@/zurich.json",
+                                                  documentsDirectory];
+    //save content to the documents directory
+    [mbtilesStyle writeToFile:mbtilesStylePath
+                     atomically:NO
+                           encoding:NSStringEncodingConversionAllowLossy
+                                  error:nil];
+    
+    NSString *full = [NSString stringWithFormat:@"mbtiles://%@", mbtilesStylePath];
+    NSLog(@"full %@", full);
+    
     /// Style that does not require an `apiKey` nor any further configuration
     [self.styleNames addObject:@"MapLibre Basic"];
-    [self.styleURLs addObject:[NSURL URLWithString:@"https://demotiles.maplibre.org/style.json"]];
+    [self.styleURLs addObject:[NSURL URLWithString:full]];
 
     /// Add Mapbox Styles if an `apiKey` exists
     NSString* apiKey = [MGLSettings apiKey];
