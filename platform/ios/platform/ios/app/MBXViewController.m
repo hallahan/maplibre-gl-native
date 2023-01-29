@@ -1932,7 +1932,7 @@ CLLocationCoordinate2D randomWorldCoordinate(void) {
                            encoding:NSStringEncodingConversionAllowLossy
                                   error:nil];
     
-    NSString *full = [NSString stringWithFormat:@"mbtiles://%@", mbtilesStylePath];
+    NSString *full = [NSString stringWithFormat:@"file://%@", mbtilesStylePath];
     NSLog(@"full %@", full);
     
     /// Style that does not require an `apiKey` nor any further configuration
